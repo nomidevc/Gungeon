@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEditor.MPE;
 using UnityEngine;
 
 public class RoomNodeSO : ScriptableObject
@@ -17,6 +18,8 @@ public class RoomNodeSO : ScriptableObject
 
 #if UNITY_EDITOR
     [HideInInspector] public Rect roomNodeRect;
+    [HideInInspector] public bool isLeftClickDragging = false;
+    [HideInInspector] public bool isSelected = false;
 
     /// <summary>
     /// Initialise the Room Node Scriptable Object
@@ -61,14 +64,81 @@ public class RoomNodeSO : ScriptableObject
     private string[] GetRoomNodeTypeToDisplay()
     {
         string[] roomNameArrayToDisplay = new string[roomNodeTypeList.list.Count];
-        for(int i = 0; i < roomNodeTypeList.list.Count; i++)
+        for (int i = 0; i < roomNodeTypeList.list.Count; i++)
         {
-            if(roomNodeTypeList.list[i].displayInNodeGraphEditor)
+            if (roomNodeTypeList.list[i].displayInNodeGraphEditor)
             {
                 roomNameArrayToDisplay[i] = roomNodeTypeList.list[i].roomNodeTypeName;
             }
         }
         return roomNameArrayToDisplay;
+    }
+
+    public void ProcessEvents(Event currentEvent)
+    {
+        switch (currentEvent.type)
+        {
+            case EventType.MouseDown:
+                ProcessMouseDownEvent(currentEvent);
+                break;
+            case EventType.MouseUp:
+                ProcessMouseUpEvent(currentEvent);
+                break;
+            case EventType.MouseDrag:
+                ProcessMouseDragEvent(currentEvent);
+                break;
+        }
+    }
+
+    private void ProcessMouseDragEvent(Event currentEvent)
+    {
+        if (currentEvent.button == 0)
+        {
+            ProcessLeftMouseDragEvent(currentEvent);
+        }
+    }
+
+    private void ProcessLeftMouseDragEvent(Event currentEvent)
+    {
+        isLeftClickDragging = true;
+        DragNode(currentEvent.delta);
+        GUI.changed = true;
+    }
+
+    private void DragNode(Vector2 delta)
+    {
+        roomNodeRect.position += delta;
+        EditorUtility.SetDirty(this);
+    }
+
+    private void ProcessMouseUpEvent(Event currentEvent)
+    {
+        if (currentEvent.button == 0)
+        {
+            ProcessLeftMouseUpEvent();
+        }
+    }
+
+    private void ProcessLeftMouseUpEvent()
+    {
+        if (isLeftClickDragging)
+        {
+            isLeftClickDragging = false;
+        }
+    }
+
+    private void ProcessMouseDownEvent(Event currentEvent)
+    {
+        Selection.activeObject = this;
+        if (currentEvent.button == 0)
+        {
+            ProcessLeftMouseDownEvent();
+        }
+    }
+
+    private void ProcessLeftMouseDownEvent()
+    {
+        isSelected = !isSelected;
     }
 
 #endif

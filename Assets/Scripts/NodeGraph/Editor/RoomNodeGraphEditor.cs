@@ -9,6 +9,7 @@ public class RoomNodeGraphEditor : EditorWindow
 
     private GUIStyle roomNodeStyle;
     private static RoomNodeGraphSO currentRoomNodeGraph;
+    private RoomNodeSO currentSelectedRoomNode;
     private RoomNodeTypeListSO roomNodeTypeList;
 
     private const float nodeWidth = 160f;
@@ -62,13 +63,13 @@ public class RoomNodeGraphEditor : EditorWindow
     /// this method to implement custom GUI controls or handle user input through the GUI.</remarks>
     private void OnGUI()
     {
-        if(currentRoomNodeGraph != null)
+        if (currentRoomNodeGraph != null)
         {
             ProcessEvent(Event.current);
 
             DrawRoomNodes();
         }
-        if(GUI.changed)
+        if (GUI.changed)
         {
             Repaint();
         }
@@ -76,7 +77,7 @@ public class RoomNodeGraphEditor : EditorWindow
 
     private void DrawRoomNodes()
     {
-        foreach(RoomNodeSO roomNode in currentRoomNodeGraph.roomNodeList)
+        foreach (RoomNodeSO roomNode in currentRoomNodeGraph.roomNodeList)
         {
             roomNode.Draw(roomNodeStyle);
         }
@@ -85,12 +86,37 @@ public class RoomNodeGraphEditor : EditorWindow
 
     private void ProcessEvent(Event current)
     {
-        ProcessRoomNodeGraphEvents(current);
+        if (currentSelectedRoomNode == null || !currentSelectedRoomNode.isLeftClickDragging)
+        {
+            currentSelectedRoomNode = IsMouseOverRoomNode(current);
+        }
+        if (currentSelectedRoomNode == null)
+        {
+            // Process events for the Room Node Graph
+            ProcessRoomNodeGraphEvents(current);
+        }
+        else
+        {
+            currentSelectedRoomNode.ProcessEvents(current);
+        }
+
+    }
+
+    private RoomNodeSO IsMouseOverRoomNode(Event current)
+    {
+        for (int i = currentRoomNodeGraph.roomNodeList.Count - 1; i >= 0; i--)
+        {
+            if (currentRoomNodeGraph.roomNodeList[i].roomNodeRect.Contains(current.mousePosition))
+            {
+                return currentRoomNodeGraph.roomNodeList[i];
+            }
+        }
+        return null;
     }
 
     private void ProcessRoomNodeGraphEvents(Event current)
     {
-        switch(current.type)
+        switch (current.type)
         {
             case EventType.MouseDown:
                 ProcessEventMouseDown(current);
@@ -103,7 +129,7 @@ public class RoomNodeGraphEditor : EditorWindow
 
     private void ProcessEventMouseDown(Event current)
     {
-        if(current.button == 1) // Right mouse button
+        if (current.button == 1) // Right mouse button
         {
             ShowContextMenu(current.mousePosition);
         }
@@ -124,7 +150,7 @@ public class RoomNodeGraphEditor : EditorWindow
 
     private void CreateRoomNode(object mousePositonObject, RoomNodeTypeSO roomNodeTypeSO)
     {
-        Vector2 mousePostion = (Vector2)mousePositonObject ;
+        Vector2 mousePostion = (Vector2)mousePositonObject;
 
         RoomNodeSO roomNodeSO = ScriptableObject.CreateInstance<RoomNodeSO>();
         currentRoomNodeGraph.roomNodeList.Add(roomNodeSO);
