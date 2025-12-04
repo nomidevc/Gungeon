@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class RoomNodeSO : ScriptableObject
 {
-    [HideInInspector] public string roomNodeID;
+    [HideInInspector] public string roomNodeID; 
     [HideInInspector] public List<string> parentRoomNodeID = new List<string>();
     [HideInInspector] public List<string> childRoomNodeID = new List<string>();
     [HideInInspector] public RoomNodeGraphSO roomNodeGraph;
@@ -134,11 +134,31 @@ public class RoomNodeSO : ScriptableObject
         {
             ProcessLeftMouseDownEvent();
         }
+        if (currentEvent.button == 1)
+        {
+            ProcessRightMouseDownEvent(currentEvent);
+        }
+    }
+    private void ProcessRightMouseDownEvent(Event currentEvent)
+    {
+        roomNodeGraph.SetNodeToDrawConnectionLineFrom(this, currentEvent.mousePosition);
     }
 
     private void ProcessLeftMouseDownEvent()
     {
         isSelected = !isSelected;
+    }
+    
+    public bool AddChildRoomNodeID(string childRoomNodeIDToAdd)
+    {
+        childRoomNodeID.Add(childRoomNodeIDToAdd);
+        return true;
+    }
+    
+    public bool AddParentRoomNodeID(string parentRoomNodeIDToAdd)
+    {
+        parentRoomNodeID.Add(parentRoomNodeIDToAdd);
+        return true;
     }
 
 #endif

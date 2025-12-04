@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public static class HelperUtilities 
@@ -11,7 +10,7 @@ public static class HelperUtilities
     {
         if (stringToCheck == "")
         {
-            Debug.LogError($"{fieldName} is empty and must contains a value {thisObject.name.ToString()}");
+            Debug.LogError($"{fieldName} is empty and must contains a value {thisObject.name}");
             return true;
         }
         return false;
@@ -24,7 +23,7 @@ public static class HelperUtilities
     {
         if (enumerableToCheck == null)
         {
-            Debug.LogError($"{fieldName} is null and must be assigned a value in {thisObject.name.ToString()}");
+            Debug.LogError($"{fieldName} is null and must be assigned a value in {thisObject.name}");
             return true;
         }
         int count = 0;
@@ -32,14 +31,14 @@ public static class HelperUtilities
         {
             if (item == null)
             {
-                Debug.LogError($"{fieldName} has null values and all values must be assigned in {thisObject.name.ToString()}");
+                Debug.LogError($"{fieldName} has null values and all values must be assigned in {thisObject.name}");
                 return true;
             }
             count++;
         }
         if (count == 0)
         {
-            Debug.LogError($"{fieldName} is empty and must be assigned a value in {thisObject.name.ToString()}");
+            Debug.LogError($"{fieldName} is empty and must be assigned a value in {thisObject.name}");
             return true;
         }
         return false;
