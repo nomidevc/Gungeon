@@ -24,6 +24,15 @@ public class RoomNodeGraphSO : EditorWindow
             roomNodeDictionary[roomNodeSo.roomNodeID] = roomNodeSo;
         }
     }
+    
+    public RoomNodeSO GetRoomNodeFromID(string roomNodeID)
+    {
+        if (roomNodeDictionary.TryGetValue(roomNodeID, out RoomNodeSO roomNode))
+        {
+            return roomNode;
+        }
+        return null;
+    }
 
     #region Editor Code
 

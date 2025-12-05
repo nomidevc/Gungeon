@@ -157,13 +157,63 @@ public class RoomNodeSO : ScriptableObject
     
     public bool AddChildRoomNodeID(string childRoomNodeIDToAdd)
     {
-        childRoomNodeID.Add(childRoomNodeIDToAdd);
-        return true;
+        if (IsChildRoomValid(childRoomNodeIDToAdd))
+        {
+            childRoomNodeID.Add(childRoomNodeIDToAdd);
+            return true;
+        }
+        return false;
     }
     
     public bool AddParentRoomNodeID(string parentRoomNodeIDToAdd)
     {
         parentRoomNodeID.Add(parentRoomNodeIDToAdd);
+        return true;
+    }
+
+    private bool IsChildRoomValid(string childNodeID)
+    {
+        // Each graph can only have one connected Boss Room
+        bool isConnectedBossAlready = false;
+        foreach (RoomNodeSO roomNode in roomNodeGraph.roomNodeList)
+        {
+            if (roomNode.roomNodeType.isBossRoom && roomNode.parentRoomNodeID.Count > 0)
+                isConnectedBossAlready = true;
+        }
+        
+        if (roomNodeGraph.GetRoomNodeFromID(childNodeID).roomNodeType.isBossRoom && isConnectedBossAlready)
+            return false;
+        
+        if (roomNodeGraph.GetRoomNodeFromID(childNodeID).roomNodeType.isNone)
+            return false;
+
+        if (roomNodeGraph.GetRoomNodeFromID(childNodeID).roomNodeType.isEntrance)
+            return false;
+
+        if (this.roomNodeID == childNodeID)
+            return false;
+        
+        if (parentRoomNodeID.Contains(childNodeID))
+            return false;
+        
+        if (roomNodeGraph.GetRoomNodeFromID(childNodeID).parentRoomNodeID.Count > 0)
+            return false;
+        
+        if (roomNodeType.isCorridor && roomNodeGraph.GetRoomNodeFromID(childNodeID).roomNodeType.isCorridor)
+            return false;
+        
+        if (!roomNodeType.isCorridor && !roomNodeGraph.GetRoomNodeFromID(childNodeID).roomNodeType.isCorridor)
+            return false;
+        
+        if (childRoomNodeID.Contains(childNodeID))
+            return false;
+        
+        if (roomNodeGraph.GetRoomNodeFromID(childNodeID).roomNodeType.isCorridor && this.childRoomNodeID.Count >= Settings.MAX_CHILD_CORRIDOR)
+            return false;
+        
+        if (!roomNodeGraph.GetRoomNodeFromID(childNodeID).roomNodeType.isCorridor && this.childRoomNodeID.Count > 0)
+            return false;
+
         return true;
     }
 
