@@ -290,7 +290,9 @@ public class RoomNodeGraphEditor : EditorWindow
     {
         GenericMenu menu = new GenericMenu();
         menu.AddItem(new GUIContent("Add Room Node"), false, CreateRoomNode, mousePosition);
-
+        menu.AddSeparator("");
+        menu.AddItem(new GUIContent("Select All Room Nodes"), false, SelectAllRoomNodes);
+        
         menu.ShowAsContext();
     }
 
@@ -317,6 +319,15 @@ public class RoomNodeGraphEditor : EditorWindow
         AssetDatabase.SaveAssets();
         
         currentRoomNodeGraph.OnValidate();
+    }
+    
+    private void SelectAllRoomNodes()
+    {
+        foreach (RoomNodeSO roomNode in currentRoomNodeGraph.roomNodeList)
+        {
+            roomNode.isSelected = true;
+        }
+        GUI.changed = true;
     }
     
     private void InspectorSelectionChanged()
